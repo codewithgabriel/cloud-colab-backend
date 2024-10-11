@@ -12,6 +12,7 @@ const http = require("http");
 
 const { connect } = require("mongoose");
 
+//db connection
 async function connectDb() {
   await connect(process.env.DB_URL);
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
@@ -24,52 +25,26 @@ connectDb().catch((err) => {
   }
 });
 
-
-
-
+//express app
 const PORT = 9000;
 const app = express();
-
 app.use(cors());
-
-
 app.use("dist", express.static("dist"));
-
 app.use("/uploads", express.static("uploads"));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
-
-//init socketIo
-const server = http.createServer(app);
-
-const io = socketIo(server, {
-  cors: {
-    origin: "*", // You might want to restrict this in a production environment
-    methods: ["GET", "POST"],
-    credentials: true
-  },
-});
-
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, "dist")));
-
 // Catch-all route to serve index.html
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
-// app.get("/", (req, res) => {
-//   res.send("Server is running...!");
-// });
-
+// middlewares
 const getToken = require("./routes/get-token");
 app.get("/get-token", getToken);
-
 const createMeeting = require("./routes/create_meeting");
 app.post("/create-meeting/", createMeeting);
-
-//
 app.post("/validate-meeting/:meetingId", (req, res) => {
   const token = req.body.token;
   const meetingId = req.params.meetingId;
@@ -88,33 +63,44 @@ app.post("/validate-meeting/:meetingId", (req, res) => {
 });
 
 // login route
-
 const login = require("./routes/login");
 app.post("/login", login);
-
 //signup route
 const signup = require("./routes/signup");
 app.post("/signup", signup);
-
 //upload route
 const upload = require("./routes/upload");
 app.post("/upload", upload);
-
 //getUser route
 const getUser = require("./routes/getUser");
 app.post("/getUser", getUser);
-
 //getFiles
 const getFiles = require("./routes/getFiles");
-
 app.post("/getFiles", getFiles);
+
+//init socketIo
+const server = http.createServer(app);
+
+const io = socketIo(server, {
+  cors: {
+    origin: "*", // You might want to restrict this in a production environment
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+});
+
+
+
+
+server.listen(process.env.PORT || PORT, () => {
+  console.log(`API server listening at http://localhost:${PORT}`);
+});
 
 //implement socket handling
 const IO_PORT = 9090;
-server.listen( IO_PORT, () => {
+io.listen( IO_PORT, () => {
   console.log(`IO server listening at http://localhost:${IO_PORT}`);
 });
-
 
 
 io.on("connection", (socket) => {
@@ -127,7 +113,3 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 });
-app.listen(process.env.PORT || PORT, () => {
-  console.log(`API server listening at http://localhost:${PORT}`);
-});
-
