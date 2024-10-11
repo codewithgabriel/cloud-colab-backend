@@ -12,7 +12,7 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server , 
    {
     cors: {
-      origin: "*", // Consider restricting this for production
+      origin: "https://cloud-colab-backend.onrender.com", // Consider restricting this for production
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -29,7 +29,15 @@ connectDb().catch((err) => {
 
 // Express app setup
 const PORT = process.env.PORT || 9000;
-app.use(cors());
+app.use(cors( {
+  cors: {
+    origin: "https://cloud-colab-backend.onrender.com", // Consider restricting this for production
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+ }));
+
+ 
 app.use("/dist", express.static("dist"));
 app.use("/uploads", express.static("uploads"));
 app.use(express.json());
