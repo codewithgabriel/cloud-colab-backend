@@ -83,7 +83,7 @@ const ioApp = express(); // This is a separate express app for the Socket.IO ser
 
 // Create a separate HTTP server for Socket.IO
 const ioServer = http.createServer(ioApp);
-const io = socketIo(ioServer, {
+const ioSocket = socketIo(ioServer, {
   cors: {
     origin: "*", // Consider restricting this for production
     methods: ["GET", "POST"],
@@ -92,7 +92,7 @@ const io = socketIo(ioServer, {
 });
 
 // Start the Socket.IO server
-ioServer.listen(IO_PORT, () => {
+ioSocket.listen(IO_PORT, () => {
   console.log(`IO server listening at http://localhost:${IO_PORT}`);
 
 });
