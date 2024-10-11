@@ -20,7 +20,9 @@ module.exports = route.use(function (req, res)  {
     const token = jwt.sign(payload, SECRET_KEY, options);
     console.log(token)
     res.json({ token });
+    res.end()
    }catch(err) { 
       console.log(err);
+      res.end()
    }
   })

@@ -17,6 +17,9 @@ module.exports = route.use(function  (req, res) {
   
     fetch(url, options)
       .then((response) => response.json())
-      .then((result) => res.json(result)) // result will contain meetingId
+      .then((result) => {
+        res.json(result)
+        res.end()
+      }) // result will contain meetingId
       .catch((error) => console.error("error", error));
   })
