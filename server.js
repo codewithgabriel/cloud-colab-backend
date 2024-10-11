@@ -5,8 +5,6 @@ const cors = require("cors");
 const morgan = require("morgan");
 const { default: fetch } = require("node-fetch");
 const path = require("path");
-const socketIo = require("socket.io");
-const http = require("http");
 const { connect } = require("mongoose");
 
 const app = express();
@@ -82,30 +80,6 @@ app.post("/getUser", getUser);
 
 const getFiles = require("./routes/getFiles");
 app.post("/getFiles", getFiles);
-
-// // Start the Express API server
-// app.listen(PORT, () => {
-//   console.log(`API server listening at http://localhost:${PORT}`);
-// });
-
-// Socket.IO server setup with a separate HTTP server
-// const IO_PORT = process.env.IO_PORT || 9090;
-// const ioApp = express(); // This is a separate express app for the Socket.IO server
-
-// // Create a separate HTTP server for Socket.IO
-// const ioServer = http.createServer(ioApp);
-// const ioSocket = socketIo(ioServer, {
-//   cors: {
-//     origin: "*", // Consider restricting this for production
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   },
-// });
-
-// Start the Socket.IO server
-// ioSocket.listen(IO_PORT, () => {
-//   console.log(`IO server listening at http://localhost:${IO_PORT}`);
-// });
 
 
 
