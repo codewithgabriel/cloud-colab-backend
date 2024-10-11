@@ -119,20 +119,7 @@ server.listen( IO_PORT, () => {
 io.on("connection", (socket) => {
   console.log("New user connected.");
   socket.on("sendMessage", (message) => {
-    // if (message.buffer) {
-    //   fs.writeFile('uploads', Buffer.from(message.buffer), (err) => {
-    //     if (err) {
-    //         console.error('File write error:', err);
-    //         socket.emit('uploadStatus', 'failure');
-    //     } else {
-    //         console.log('File uploaded successfully');
-    //         socket.emit('uploadStatus', 'success');
-    //     }
-    // });
-    // }
-
     io.emit("receiveMessage", message);
-    //implementing message with file saving
   });
 
   socket.on("disconnect", () => {

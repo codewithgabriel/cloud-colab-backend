@@ -10,7 +10,6 @@ route.use(jwtValidator);
 module.exports = route.use( async (req, res) => {
   try {
     const { meetingId } = req.body;
-    console.log(meetingId)
 
     const files = await Files.find({ meetingId });
     res.send({
