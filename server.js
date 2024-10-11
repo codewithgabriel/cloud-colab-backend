@@ -5,52 +5,45 @@ const cors = require("cors");
 const morgan = require("morgan");
 const { default: fetch } = require("node-fetch");
 const path = require("path");
-
-//const jwt = require("jsonwebtoken");
 const socketIo = require("socket.io");
 const http = require("http");
-
 const { connect } = require("mongoose");
 
-//db connection
+// Database connection
 async function connectDb() {
   await connect(process.env.DB_URL);
-  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 connectDb().catch((err) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log("Database Connected");
-  }
+  console.log("Database Connection Error:", err);
 });
 
-//express app
-const PORT = 9000;
+// Express app setup
+const PORT = process.env.PORT || 9000;
 const app = express();
 app.use(cors());
-app.use("dist", express.static("dist"));
+app.use("/dist", express.static("dist"));
 app.use("/uploads", express.static("uploads"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
-// Serve static files from the React app
 app.use(express.static(path.join(__dirname, "dist")));
+
 // Catch-all route to serve index.html
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
-// middlewares
+
+// Express Routes
 const getToken = require("./routes/get-token");
 app.get("/get-token", getToken);
+
 const createMeeting = require("./routes/create_meeting");
 app.post("/create-meeting/", createMeeting);
+
 app.post("/validate-meeting/:meetingId", (req, res) => {
   const token = req.body.token;
   const meetingId = req.params.meetingId;
-
   const url = `${process.env.VIDEOSDK_API_ENDPOINT}/api/meetings/${meetingId}`;
-
   const options = {
     method: "POST",
     headers: { Authorization: token },
@@ -58,58 +51,60 @@ app.post("/validate-meeting/:meetingId", (req, res) => {
 
   fetch(url, options)
     .then((response) => response.json())
-    .then((result) => res.json(result)) // result will contain meetingId
-    .catch((error) => console.error("error", error));
+    .then((result) => res.json(result))
+    .catch((error) => console.error("Validation Error:", error));
 });
 
-// login route
+// Authentication routes
 const login = require("./routes/login");
 app.post("/login", login);
-//signup route
+
 const signup = require("./routes/signup");
 app.post("/signup", signup);
-//upload route
+
+// File and user routes
 const upload = require("./routes/upload");
 app.post("/upload", upload);
-//getUser route
+
 const getUser = require("./routes/getUser");
 app.post("/getUser", getUser);
-//getFiles
+
 const getFiles = require("./routes/getFiles");
 app.post("/getFiles", getFiles);
 
-//init socketIo
-const server = http.createServer(app);
-
-const io = socketIo(server, {
-  cors: {
-    origin: "*", // You might want to restrict this in a production environment
-    methods: ["GET", "POST"],
-    credentials: true
-  },
-});
-
-
-
-
-server.listen(process.env.PORT || PORT, () => {
+// Start the Express API server
+app.listen(PORT, () => {
   console.log(`API server listening at http://localhost:${PORT}`);
 });
 
-//implement socket handling
-const IO_PORT = 9090;
-io.listen( IO_PORT, () => {
+// Socket.IO server setup with a separate HTTP server
+const IO_PORT = process.env.IO_PORT || 9090;
+const ioApp = express(); // This is a separate express app for the Socket.IO server
+
+// Create a separate HTTP server for Socket.IO
+const ioServer = http.createServer(ioApp);
+const io = socketIo(ioServer, {
+  cors: {
+    origin: "*", // Consider restricting this for production
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+// Start the Socket.IO server
+ioServer.listen(IO_PORT, () => {
   console.log(`IO server listening at http://localhost:${IO_PORT}`);
 });
 
-
+// Handle socket connections
 io.on("connection", (socket) => {
   console.log("New user connected.");
+
   socket.on("sendMessage", (message) => {
     io.emit("receiveMessage", message);
   });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("User disconnected");
   });
 });
