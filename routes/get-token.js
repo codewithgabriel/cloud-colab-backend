@@ -5,7 +5,7 @@ const jwtValidator = require('./jwt_validator');
 const route = express.Router() 
 
 route.use(jwtValidator)
-module.exports = route.use(function (req, res)  {
+module.exports = route.use( async function (req, res)  {
    try{
     const API_KEY = process.env.VIDEOSDK_API_KEY;
     const SECRET_KEY = process.env.VIDEOSDK_SECRET_KEY;
@@ -19,7 +19,7 @@ module.exports = route.use(function (req, res)  {
   
     const token = jwt.sign(payload, SECRET_KEY, options);
     console.log(token)
-    res.json({ token });
+    res.send({ token });
     res.end()
    }catch(err) { 
       console.log(err);
