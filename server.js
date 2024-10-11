@@ -37,7 +37,7 @@ app.use(cors( {
   },
  }));
 
- 
+
 app.use("/dist", express.static("dist"));
 app.use("/uploads", express.static("uploads"));
 app.use(express.json());
@@ -52,7 +52,7 @@ app.get("*", (req, res) => {
 
 // Express Routes
 const getToken = require("./routes/get-token");
-app.get("/get-token", getToken);
+app.post("/get-token", getToken);
 
 const createMeeting = require("./routes/create_meeting");
 app.post("/create-meeting/", createMeeting);
