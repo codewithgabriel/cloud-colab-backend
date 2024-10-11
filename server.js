@@ -110,7 +110,7 @@ app.post("/getFiles", getFiles);
 
 //implement socket handling
 const IO_PORT = 9090;
-server.listen(IO_PORT, () => {
+server.listen( IO_PORT, () => {
   console.log(`IO server listening at http://localhost:${IO_PORT}`);
 });
 
@@ -139,7 +139,7 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 });
-app.listen(PORT, () => {
+app.listen(process.env.PORT || PORT, () => {
   console.log(`API server listening at http://localhost:${PORT}`);
 });
 
