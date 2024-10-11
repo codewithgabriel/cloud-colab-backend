@@ -94,10 +94,13 @@ const io = socketIo(ioServer, {
 // Start the Socket.IO server
 ioServer.listen(IO_PORT, () => {
   console.log(`IO server listening at http://localhost:${IO_PORT}`);
+
 });
 
+
+
 // Handle socket connections
-io.on("connection", (socket) => {
+ioServer.on("connection", (socket) => {
   console.log("New user connected.");
 
   socket.on("sendMessage", (message) => {
