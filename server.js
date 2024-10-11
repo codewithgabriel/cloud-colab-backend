@@ -48,6 +48,7 @@ const io = socketIo(server, {
   cors: {
     origin: "*", // You might want to restrict this in a production environment
     methods: ["GET", "POST"],
+    credentials: true
   },
 });
 
